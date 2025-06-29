@@ -1,4 +1,4 @@
-package main 
+package main
 
 import "fmt"
 import "example.com/go/reader"
@@ -12,11 +12,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	sortedFileSize, err := file.GetSortedFileSize(filePaths)
-
-	if err != nil {
-		fmt.Println(err)
-	}
+	sortedFileSize := file.GetSortedFileSize(filePaths)
 
 	fmt.Println(sortedFileSize)
 

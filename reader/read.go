@@ -7,7 +7,7 @@ import (
 
 func Read(filePath string) ([]string, error) {
 	byteArray, err := os.ReadFile(filePath)
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -15,7 +15,7 @@ func Read(filePath string) ([]string, error) {
 	content := string(byteArray)
 
 	lines := strings.Split(content, "\n")
-	
+
 	return lines, err
 
 }

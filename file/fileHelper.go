@@ -20,26 +20,29 @@ func SortFileSize(result *[]FileSize) {
 
 func GetSortedFileSize(filePath []string) []FileSize {
 	var result = []FileSize{}
-	mutex := sync.Mutex{}
+	ch := make(chan (FileSize), len(filePath))
 	wg := sync.WaitGroup{}
 
 	for _, filePath := range filePath {
 		wg.Add(1)
-		go GetPageSize(filePath, &result, &mutex, &wg)
+		go GetPageSize(filePath, &wg, ch)
 	}
 
 	wg.Wait()
+	close(ch)
+
+	for fileSize := range ch {
+		result = append(result, fileSize)
+	}
+
 	SortFileSize(&result)
 
 	return result
 
 }
 
-func GetPageSize(url string, result *[]FileSize, mutex *sync.Mutex, wg *sync.WaitGroup) error {
+func GetPageSize(url string, wg *sync.WaitGroup, ch chan FileSize) error {
 	defer wg.Done()
-	mutex.Lock()
-
-	defer mutex.Unlock()
 
 	res, err := http.Get(url)
 
@@ -55,10 +58,10 @@ func GetPageSize(url string, result *[]FileSize, mutex *sync.Mutex, wg *sync.Wai
 		return err
 	}
 
-	*result = append(*result, FileSize{
+	ch <- FileSize{
 		Url:  url,
 		Size: int64(len(body)),
-	})
+	}
 
 	return nil
 }
